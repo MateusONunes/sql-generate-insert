@@ -221,7 +221,7 @@ BEGIN
   SET @ColumnExpression = 
     CASE
     WHEN @DataType IN ('char','varchar','text','uniqueidentifier')
-    THEN N'ISNULL(''''''''+REPLACE(CONVERT(varchar(max),'+  QUOTENAME(@ColumnName) + N'),'''''''','''''''''''')+'''''''',''NULL'') COLLATE database_default'
+    THEN N'ISNULL(''''''''+TRIM(REPLACE(CONVERT(varchar(max),'+  QUOTENAME(@ColumnName) + N'),'''''''',''''''''''''))+'''''''',''NULL'') COLLATE database_default'
       
     WHEN @DataType IN ('nchar','nvarchar','sysname','ntext','sql_variant','xml')
     THEN N'ISNULL(''N''''''+REPLACE(CONVERT(nvarchar(max),'+  QUOTENAME(@ColumnName) + N'),'''''''','''''''''''')+'''''''',''NULL'') COLLATE database_default'
@@ -517,6 +517,8 @@ BEGIN
     DECLARE @CurrentEnd bigint; -- track the length of the next sub-string
     DECLARE @Offset tinyint; -- tracks the amount of offset needed
     SET @TableRow = REPLACE(REPLACE(@TableRow, CHAR(13) + CHAR(10), CHAR(10)), CHAR(13), CHAR(10));
+    SET @TableRow = REPLACE(@TableRow, '[', '');
+    SET @TableRow = REPLACE(@TableRow, ']', '');
 
     WHILE LEN(@TableRow) > 1
     BEGIN
